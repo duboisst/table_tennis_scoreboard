@@ -1,13 +1,22 @@
 module Score
     class ScoreWindow < Gtk::Window
 
-      def initialize(match)
+      def initialize
         super 0
-        @match = match
+      end
+
+      def match=(match)
+        @match=match
         init_ui
       end
 
+    private
+
       def init_ui
+        self.children.each do |widget|
+          self.remove widget
+        end
+
         @css_provider = Gtk::CssProvider.new
         @css_provider.load(data: ".game, .score { \
                                     color: white; \
@@ -49,23 +58,6 @@ module Score
         end
         add @grid
         show_all
-      end
-
-      def refresh_match(match)
-        @match = match
-        for p in 0..1
-          @players_name[p].text = @match.players[p][:name]
-          @players_serve[p].visible = @match.players[p][:serve] || false
-          @games[p].text = @match.player_games(p).to_s
-
-          for g in 0..@match.number_of_games-1
-            if @match.players[p][:games][g]
-              @scores[p][g].text = "%.0f" % @match.players[p][:games][g]
-            else
-              @scores[p][g].text = ''
-            end
-          end
-        end
       end
 
       private

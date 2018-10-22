@@ -77,9 +77,16 @@ module Score
       players[player_indice][:serve]
     end
 
+    def players=(input)
+      @players = input
+      limits!
+    end
+
     private
 
     def limits!
+      puts "PLAYERS at begining of limits!: #{players}"
+
       for p in 0..1
         for g in 0..number_of_games-1
           score = players[p][:games][g]
@@ -98,6 +105,8 @@ module Score
           end
         end
       end
+      puts "PLAYERS at end of limits!: #{players}"
+
     end
   end
 end

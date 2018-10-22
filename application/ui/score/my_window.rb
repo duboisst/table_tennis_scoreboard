@@ -10,6 +10,7 @@ module Score
 
         def initialize(application)
             super application: application
+            @scoreboard_window = ScoreWindow.new
             new_match
         end
 
@@ -69,13 +70,13 @@ module Score
                 @names[player] = Gtk::Entry.new
                 @names[player].text = @match.players[player][:name]
                 @names[player].signal_connect 'changed' do
-                    set_match
+                    update_match
                 end
                 grid.attach @names[player], 0, 1+player, 1, 1
                 @rb[player] = Gtk::RadioButton.new if player == 0
                 @rb[player] = Gtk::RadioButton.new(member: @rb[0]) if player > 0
                 @rb[player].signal_connect 'toggled' do
-                    set_match
+                    update_match
                 end
                 grid.attach @rb[player], 1, 1+player, 1, 1
                 @sb[player] = []
@@ -94,7 +95,7 @@ module Score
                                 @rb[0].set_active(true) 
                             end
                         end
-                        m = set_match
+                        m = update_match
                         spinbutton.value = m.players[p][:games][g] if m.players[p][:games][g]
                         if p==0 then op=1 else op=0 end
                         @sb[op][g].value = m.players[op][:games][g] if m.players[op][:games][g]
@@ -108,7 +109,7 @@ module Score
                 @tb[game] = Gtk::ToggleButton.new(label: "Afficher")
                 @tb[game].active = @match.players[0][:games][game] || @match.players[1][:games][game] || false 
                 @tb[game].signal_connect 'toggled' do
-                    set_match
+                    update_match
                 end
                 grid.attach @tb[game], 2+game, 3, 1, 1
             end
@@ -116,22 +117,18 @@ module Score
             vbox.pack_start grid, :expand => true, :fill => true, :padding => 10
             add vbox           
             set_window_position :mouse
-
             show_all      
-            refresh_scoreboard
         end
 
         def update_settings(match)
-            puts "SCOREBOARD: #{@scoreboard_window.inspect}"
-            @scoreboard_window.close
             @match = match
+            @scoreboard_window.match = @match
             init_ui
-            puts "SCOREBOARD: #{@scoreboard_window.inspect}"
         end
 
     private
 
-        def set_match
+        def update_match
             players = [{name: @names[0].text, games: [], serve: @rb[0].active?}, {name: @names[1].text, games: [], serve: @rb[1].active?}]
             for p in 0..1
                 for g in 0..@match.number_of_games-1
@@ -143,25 +140,21 @@ module Score
                 end
             end            
             @match.players = players
-            @scoreboard_window.refresh_match @match
+            @scoreboard_window.match = @match
             @match
         end
 
         def new_match
             @match = Score::MyMatch.new(id: 'match1', user_data_path: application.user_data_path, number_of_games: 5)
+            @scoreboard_window.match =  @match
             init_ui
         end
 
         def load_match
             @match = Score::MyMatch.new(user_data_path: application.user_data_path, filename: '.gtk-score/match1.json')
+            @scoreboard_window.match = @match
             init_ui
         end
-
-        def refresh_scoreboard
-            @scoreboard_window.close if @scoreboard_window
-            @scoreboard_window = ScoreWindow.new(@match)
-            @scoreboard_window.present
-        end  
             
     end
 end
