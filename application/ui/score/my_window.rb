@@ -10,9 +10,9 @@ module Score
 
         def initialize(application)
             super application: application
-            @number_of_games = 5
+            @settings = {number_of_games: 5}
             init_ui
-            @scoreboard_window = ScoreWindow.new(@number_of_games)
+            @scoreboard_window = ScoreWindow.new(@settings[:number_of_games])
             new_match
             @scoreboard_window.present
         end
@@ -27,9 +27,10 @@ module Score
             filemenu = Gtk::Menu.new
             file = Gtk::MenuItem.new label: "File"
             file.set_submenu filemenu
-            filemenu.append(new_menu = Gtk::MenuItem.new(label: "New"))
-            filemenu.append(load_menu = Gtk::MenuItem.new(label: "Load"))
-            filemenu.append(save_menu = Gtk::MenuItem.new(label: "Save"))
+            filemenu.append(new_menu = Gtk::MenuItem.new(label: "Nouveau match"))
+            filemenu.append(load_menu = Gtk::MenuItem.new(label: "Charger un match"))
+            filemenu.append(save_menu = Gtk::MenuItem.new(label: "Sauvegarder le match"))
+            filemenu.append(match_settings_menu = Gtk::MenuItem.new(label: "Configurer le match..."))
             new_menu.signal_connect 'activate' do
                 new_match
             end
@@ -40,15 +41,18 @@ module Score
             save_menu.signal_connect 'activate' do
                 set_match.save!
             end
+            match_settings_menu.signal_connect 'activate' do
+                Score::MatchSettingsWindow.new({}, self, @settings).present
+            end
 
             mb.append file
     
             vbox.pack_start mb, :expand => false, :fill => false, :padding => 0
             
             nbgames = Gtk::SpinButton.new(1,7,1)
-            nbgames.value = @number_of_games
+            nbgames.value = @settings[:number_of_games]
             nbgames.signal_connect 'value-changed' do |sb|
-                @number_of_games = sb.value
+                @settings[:number_of_games] = sb.value
                 set_match
             end
             # vbox.pack_start nbgames, :expand => false, :fill => false, :padding => 0
@@ -63,7 +67,7 @@ module Score
             grid.attach Gtk::Label.new("Nom"), 0, 0, 1, 1
             grid.attach Gtk::Label.new("Service"), 1, 0, 1, 1
             
-            for game in 0..@number_of_games-1
+            for game in 0..@settings[:number_of_games]-1
                 grid.attach Gtk::Label.new("Manche #{game+1}"), 2+game, 0, 1, 1
             end
 
@@ -83,7 +87,7 @@ module Score
                 end
                 grid.attach @rb[player], 1, 1+player, 1, 1
                 @sb[player] = []
-                for game in 0..@number_of_games-1
+                for game in 0..@settings[:number_of_games]-1
                     @sb[player][game] = Gtk::SpinButton.new(0,99,1)
                     @sb[player][game].set_max_width_chars 2
                     @sb[player][game].value = 0
@@ -108,7 +112,7 @@ module Score
             end
 
             @tb=[]
-            for game in 0..@number_of_games-1
+            for game in 0..@settings[:number_of_games]-1
                 @tb[game] = Gtk::ToggleButton.new(label: "Afficher")
                 @tb[game].signal_connect 'toggled' do
                     set_match
@@ -120,6 +124,11 @@ module Score
             add vbox           
             set_window_position :mouse
             show_all                
+        end
+
+        def update_settings(settings)
+            @settings = settings
+            reset_ui
         end
 
     private
@@ -134,7 +143,7 @@ module Score
             games = []
             for p in 0..1
                 games[p] = []
-                for g in 0..@number_of_games-1
+                for g in 0..@settings[:number_of_games]-1
                     if @tb[g].active?
                         games[p][g] = @sb[p][g].value
                     else
@@ -143,7 +152,7 @@ module Score
                 end
             end            
             players = [{name: @names[0].text, games: games[0], serve: @rb[0].active?}, {name: @names[1].text, games: games[1], serve: @rb[1].active?}]
-            match = Score::MyMatch.new(id: 'match1', user_data_path: application.user_data_path, players: players, number_of_games: @number_of_games)
+            match = Score::MyMatch.new(id: 'match1', user_data_path: application.user_data_path, players: players, number_of_games: @settings[:number_of_games])
             @scoreboard_window.refresh_match match
             match
         end
@@ -167,9 +176,21 @@ module Score
         end
 
         def new_match
-            match = Score::MyMatch.new(id: 'match1', user_data_path: application.user_data_path, number_of_games: @number_of_games)
+            match = Score::MyMatch.new(id: 'match1', user_data_path: application.user_data_path, number_of_games: @settings[:number_of_games])
             load match
         end
-        
+
+        def reset_ui
+            m = set_match
+            self.children.each do |widget|
+                self.remove widget
+            end
+            init_ui
+            @scoreboard_window.close
+            load m
+            @scoreboard_window = ScoreWindow.new(@settings[:number_of_games])
+            @scoreboard_window.present
+        end
+
     end
 end
