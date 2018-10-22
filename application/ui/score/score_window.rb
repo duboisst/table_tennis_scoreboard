@@ -58,6 +58,9 @@ module Score
         end
         add @grid
         show_all
+        for p in 0..1
+          @players_serve[p].visible = @match.players[p][:serve] || false
+        end
       end
 
       private

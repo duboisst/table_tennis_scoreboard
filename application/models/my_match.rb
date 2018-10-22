@@ -30,13 +30,13 @@ module Score
     def load_from_file(filename)
       puts "LOAD MATCH #{filename}"
       properties = JSON.parse(File.read(filename),{:symbolize_names => true})
-      puts "Properties: #{properties.inspect}"
+      puts "LOAD - Properties: #{properties.inspect}"
 
       # Assign the properties
       PROPERTIES.each do |property|
         self.send "#{property}=", properties[property]
       end
-      puts "Players: #{players.inspect}"
+      puts "LOAD - Players: #{players.inspect}"
     rescue => e
       raise ArgumentError, "Failed to load existing item: #{e.message}"
     end
@@ -85,8 +85,6 @@ module Score
     private
 
     def limits!
-      puts "PLAYERS at begining of limits!: #{players}"
-
       for p in 0..1
         for g in 0..number_of_games-1
           score = players[p][:games][g]
@@ -105,8 +103,6 @@ module Score
           end
         end
       end
-      puts "PLAYERS at end of limits!: #{players}"
-
     end
   end
 end

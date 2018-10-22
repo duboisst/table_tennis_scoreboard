@@ -138,6 +138,7 @@ module Score
                         players[p][:games][g] = nil
                     end 
                 end
+                players[p][:serve] = @rb[p].active?
             end            
             @match.players = players
             @scoreboard_window.match = @match
