@@ -33,6 +33,10 @@ module Score
           close
         end
 
+        number_of_games_spinbutton.signal_connect 'value-changed' do  |sb|
+          @settings[:number_of_games] = sb.value
+        end
+
         players_bgcolor_button.signal_connect 'clicked' do 
           Score::ColorChooserDialog.new({}, self, @settings).present
         end

@@ -1,13 +1,13 @@
 module Score
     class ScoreWindow < Gtk::Window
 
-      def initialize(number_of_games)
+      def initialize(match)
         super 0
-        init_ui number_of_games
-        show_all
+        @match = match
+        init_ui
       end
 
-      def init_ui(number_of_games)
+      def init_ui
         @css_provider = Gtk::CssProvider.new
         @css_provider.load(data: ".game, .score { \
                                     color: white; \
@@ -43,22 +43,24 @@ module Score
           display_player p
           display_games p        
           @scores << []
-          for g in 0..number_of_games-1
+          for g in 0..@match.number_of_games-1
             display_score p, g
           end
         end
         add @grid
+        show_all
       end
 
       def refresh_match(match)
+        @match = match
         for p in 0..1
-          @players_name[p].text = match.players[p][:name]
-          @players_serve[p].visible = match.players[p][:serve] || false
-          @games[p].text = match.player_games(p).to_s
+          @players_name[p].text = @match.players[p][:name]
+          @players_serve[p].visible = @match.players[p][:serve] || false
+          @games[p].text = @match.player_games(p).to_s
 
-          for g in 0..match.number_of_games-1
-            if match.players[p][:games][g]
-              @scores[p][g].text = "%.0f" % match.players[p][:games][g]
+          for g in 0..@match.number_of_games-1
+            if @match.players[p][:games][g]
+              @scores[p][g].text = "%.0f" % @match.players[p][:games][g]
             else
               @scores[p][g].text = ''
             end
@@ -70,6 +72,7 @@ module Score
 
       def display_player(p)
         @players_name << Gtk::Label.new("Player#{p}")
+        @players_name[p].text = @match.players[p][:name]
         @players_name[p].set_xalign 0
         @players_name[p].style_context.add_class 'player'
         @players_name[p].style_context.add_provider(@css_provider, Gtk::StyleProvider::PRIORITY_USER)
@@ -85,6 +88,7 @@ module Score
         bh.override_background_color 0, Gdk::RGBA.parse('#3664c9')
 
         @players_serve << Gtk::Image.new(file: "resources/ui/serve.png")
+        @players_serve[p].visible = @match.players[p][:serve] || false
         @players_serve[p].set_xalign 0.5
         @players_serve[p].style_context.add_class 'serve'
         @players_serve[p].style_context.add_provider(@css_provider, Gtk::StyleProvider::PRIORITY_USER)
@@ -100,6 +104,7 @@ module Score
 
       def display_games(p)
         @games << Gtk::Label.new("G#{p}")
+        @games[p].text = @match.player_games(p).to_s
         @games[p].set_xalign 0.5
         @games[p].style_context.add_class 'game'
         @games[p].style_context.add_provider(@css_provider, Gtk::StyleProvider::PRIORITY_USER)
@@ -116,6 +121,12 @@ module Score
 
       def display_score(p, g)
         @scores[p] << Gtk::Label.new("#{p}#{g}")
+        if @match.players[p][:games][g]
+          @scores[p][g].text = "%.0f" % @match.players[p][:games][g]
+        else
+          @scores[p][g].text = ''
+        end
+
         @scores[p][g].set_xalign 1
         @scores[p][g].style_context.add_class 'score'
         @scores[p][g].style_context.add_provider(@css_provider, Gtk::StyleProvider::PRIORITY_USER)
