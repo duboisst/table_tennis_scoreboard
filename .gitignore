@@ -1,0 +1,6 @@
+.cache
+.config
+.history
+.local
+.bash_history
+gresource.bin
