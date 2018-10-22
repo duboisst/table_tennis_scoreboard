@@ -41,7 +41,7 @@ module Score
                 @match.save!
             end
             match_settings_menu.signal_connect 'activate' do
-                Score::MatchSettingsWindow.new({}, self, @settings).present
+                Score::MatchSettingsWindow.new({}, self, @match).present
             end
 
             mb.append file
@@ -121,9 +121,12 @@ module Score
             refresh_scoreboard
         end
 
-        def update_settings(settings)
-            @settings = settings
-            reset_ui
+        def update_settings(match)
+            puts "SCOREBOARD: #{@scoreboard_window.inspect}"
+            @scoreboard_window.close
+            @match = match
+            init_ui
+            puts "SCOREBOARD: #{@scoreboard_window.inspect}"
         end
 
     private

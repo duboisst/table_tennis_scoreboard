@@ -10,13 +10,11 @@ module Score
           end
       end
 
-      def initialize(options, parent_window, settings)
+      def initialize(options, parent_window)
         super options
         set_modal true
         set_resizable false
         set_title "Choisir la couleur"
-        @settings = settings
-        
       end
 
     end

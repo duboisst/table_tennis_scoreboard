@@ -16,16 +16,16 @@ module Score
           end
       end
 
-      def initialize(options, parent_window, settings)
+      def initialize(options, parent_window, match)
         super options
         set_modal true
         set_resizable false
         set_title "Configurer le match"
-        @settings = settings
-        number_of_games_spinbutton.value = @settings[:number_of_games]
+        @match = match
+        number_of_games_spinbutton.value = @match.number_of_games
         
         ok_button.signal_connect 'clicked' do 
-          parent_window.update_settings @settings
+          parent_window.update_settings @match
           close
         end
 
@@ -34,17 +34,17 @@ module Score
         end
 
         number_of_games_spinbutton.signal_connect 'value-changed' do  |sb|
-          @settings[:number_of_games] = sb.value
+          @match.number_of_games = sb.value
         end
 
         players_bgcolor_button.signal_connect 'clicked' do 
-          Score::ColorChooserDialog.new({}, self, @settings).present
+          Score::ColorChooserDialog.new({}, self).present
         end
         games_bgcolor_button.signal_connect 'clicked' do 
-          Score::ColorChooserDialog.new({}, self, @settings).present
+          Score::ColorChooserDialog.new({}, self).present
         end
         scores_bgcolor_button.signal_connect 'clicked' do 
-          Score::ColorChooserDialog.new({}, self, @settings).present
+          Score::ColorChooserDialog.new({}, self).present
         end
 
       end
