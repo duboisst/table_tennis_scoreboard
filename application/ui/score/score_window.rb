@@ -3,11 +3,16 @@ module Score
 
       def initialize
         super 0
+        @settings = {players_font: "Sans 10", players_color: Gdk::RGBA.parse('#3664c9'), games_color: Gdk::RGBA.parse('#df2629'), scores_color: Gdk::RGBA.parse('#3664c9')}
       end
 
       def match=(match)
         @match=match
         init_ui
+      end
+
+      def settings=(settings)
+        @settings.merge!(settings)
       end
 
     private
@@ -68,6 +73,7 @@ module Score
       def display_player(p)
         @players_name << Gtk::Label.new("Player#{p}")
         @players_name[p].text = @match.players[p][:name]
+        @players_name[p].override_font(Pango::FontDescription.new(@settings[:players_font]))
         @players_name[p].set_xalign 0
         @players_name[p].style_context.add_class 'player'
         @players_name[p].style_context.add_provider(@css_provider, Gtk::StyleProvider::PRIORITY_USER)
@@ -80,7 +86,7 @@ module Score
         b.margin = 0
         bh = Gtk::Box.new :horizontal, 0
         bh.pack_start b, :expand => false, :fill => false, :padding => 0
-        bh.override_background_color 0, Gdk::RGBA.parse('#3664c9')
+        bh.override_background_color 0, @settings[:players_color]
 
         @players_serve << Gtk::Image.new(file: "resources/ui/serve.png")
         @players_serve[p].visible = @match.players[p][:serve] || false
@@ -90,7 +96,7 @@ module Score
         @players_serve[p].margin = 5
         b = Gtk::Box.new :vertical, 0
         b.set_center_widget @players_serve[p]
-        b.override_background_color 0, Gdk::RGBA.parse('#3664c9')
+        b.override_background_color 0, @settings[:players_color]
         b.set_size_request 20, -1
         b.margin = 0
         bh.pack_end b, :expand => false, :fill => false, :padding => 0
@@ -108,7 +114,7 @@ module Score
         @games[p].set_margin_bottom 5
         @games[p].set_margin_left 7
         b = Gtk::Box.new :vertical, 0
-        b.override_background_color(0, Gdk::RGBA.parse('#df2629'))
+        b.override_background_color(0, @settings[:games_color])
         b.set_center_widget @games[p]
         b.margin = 0
         @grid.attach b, 2, p, 1, 1
@@ -130,7 +136,7 @@ module Score
         @scores[p][g].set_margin_bottom 5
         @scores[p][g].set_margin_left 8
         b = Gtk::Box.new :vertical, 0
-        b.override_background_color 0, Gdk::RGBA.parse('#3664c9')
+        b.override_background_color 0, @settings[:scores_color]
         b.set_center_widget @scores[p][g]
         b.margin = 0
         @grid.attach b, 3+g, p, 1, 1

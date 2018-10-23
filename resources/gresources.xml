@@ -2,6 +2,5 @@
 <gresources>
   <gresource prefix="/com/sds/gtk-score">
     <file preprocess="xml-stripblanks">ui/match_settings.ui</file>
-    <file preprocess="xml-stripblanks">ui/color_chooser_dialog.ui</file>
   </gresource>
 </gresources>

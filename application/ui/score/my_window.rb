@@ -9,7 +9,7 @@ module Score
         end
 
         def initialize(application)
-            super application: application
+            super application: application            
             @scoreboard_window = ScoreWindow.new
             new_match
         end
@@ -42,10 +42,13 @@ module Score
                 @match.save!
             end
             match_settings_menu.signal_connect 'activate' do
-                dialog = Score::MatchSettingsWindow.new({parent: self},  @match)
+                dialog = Score::MatchSettingsWindow.new({parent: self}, {number_of_games: @match.number_of_games}.merge(@match.settings||{}))
                 if dialog.run == Gtk::ResponseType::OK
-                    col = dialog.players_color.to_s
-                    puts "players color: #{col}"
+                    @match.number_of_games = dialog.settings[:number_of_games]
+                    @match.settings = dialog.settings
+                    @scoreboard_window.settings = @match.settings
+                    @scoreboard_window.match = @match
+                    init_ui           
                 end
                 dialog.destroy;    
             end
@@ -125,12 +128,6 @@ module Score
             show_all      
         end
 
-        def update_settings(match)
-            @match = match
-            @scoreboard_window.match = @match
-            init_ui
-        end
-
     private
 
         def update_match
@@ -158,6 +155,7 @@ module Score
 
         def load_match
             @match = Score::MyMatch.new(user_data_path: application.user_data_path, filename: '.gtk-score/match1.json')
+#            @scoreboard_window.settings = @match.settings
             @scoreboard_window.match = @match
             init_ui
         end

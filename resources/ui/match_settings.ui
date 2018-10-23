@@ -103,7 +103,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton">
+              <object class="GtkButton" id="players_font_button">
                 <property name="label">gtk-select-font</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
