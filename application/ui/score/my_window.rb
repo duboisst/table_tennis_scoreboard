@@ -29,7 +29,7 @@ module Score
         
             mb = Gtk::MenuBar.new
             filemenu = Gtk::Menu.new
-            file = Gtk::MenuItem.new label: "File"
+            file = Gtk::MenuItem.new label: "Fichier"
             file.set_submenu filemenu
             filemenu.append(new_menu = Gtk::MenuItem.new(label: "Nouveau match"))
             filemenu.append(load_menu = Gtk::MenuItem.new(label: "Charger un match"))
