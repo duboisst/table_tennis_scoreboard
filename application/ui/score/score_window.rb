@@ -3,7 +3,7 @@ module Score
 
       def initialize
         super 0
-        @settings = {players_font: "Sans 10", players_color: Gdk::RGBA.parse('#3664c9'), games_color: Gdk::RGBA.parse('#df2629'), scores_color: Gdk::RGBA.parse('#3664c9')}
+        @settings = {players_font: "Sans 10", players_color: Gdk::RGBA.parse('#ffffff'), games_color: Gdk::RGBA.parse('#ffffff'), scores_color: Gdk::RGBA.parse('#ffffff'), players_bgcolor: Gdk::RGBA.parse('#3664c9'), games_bgcolor: Gdk::RGBA.parse('#df2629'), scores_bgcolor: Gdk::RGBA.parse('#3664c9')}
       end
 
       def match=(match)
@@ -23,14 +23,6 @@ module Score
         end
 
         @css_provider = Gtk::CssProvider.new
-        @css_provider.load(data: ".game, .score { \
-                                    color: white; \
-                                    font-weight: bold; \
-                                 } \
-                                 .player { \
-                                    color: white; \
-                                    font-weight: bold; \
-                                 }")
         set_keep_above true
         set_resizable false
         set_title "Scores"
@@ -73,10 +65,10 @@ module Score
       def display_player(p)
         @players_name << Gtk::Label.new("Player#{p}")
         @players_name[p].text = @match.players[p][:name]
-        @players_name[p].override_font(Pango::FontDescription.new(@settings[:players_font]))
         @players_name[p].set_xalign 0
-        @players_name[p].style_context.add_class 'player'
-        @players_name[p].style_context.add_provider(@css_provider, Gtk::StyleProvider::PRIORITY_USER)
+        @players_name[p].override_font(Pango::FontDescription.new(@settings[:players_font]))
+        @players_name[p].override_color :normal, @settings[:players_color]
+        
         @players_name[p].set_margin_right 25
         @players_name[p].set_margin_top 5
         @players_name[p].set_margin_bottom 5
@@ -86,17 +78,15 @@ module Score
         b.margin = 0
         bh = Gtk::Box.new :horizontal, 0
         bh.pack_start b, :expand => false, :fill => false, :padding => 0
-        bh.override_background_color 0, @settings[:players_color]
+        bh.override_background_color 0, @settings[:players_bgcolor]
 
         @players_serve << Gtk::Image.new(file: "resources/ui/serve.png")
         @players_serve[p].visible = @match.players[p][:serve] || false
         @players_serve[p].set_xalign 0.5
-        @players_serve[p].style_context.add_class 'serve'
-        @players_serve[p].style_context.add_provider(@css_provider, Gtk::StyleProvider::PRIORITY_USER)
         @players_serve[p].margin = 5
         b = Gtk::Box.new :vertical, 0
         b.set_center_widget @players_serve[p]
-        b.override_background_color 0, @settings[:players_color]
+        b.override_background_color 0, @settings[:players_bgcolor]
         b.set_size_request 20, -1
         b.margin = 0
         bh.pack_end b, :expand => false, :fill => false, :padding => 0
@@ -107,14 +97,14 @@ module Score
         @games << Gtk::Label.new("G#{p}")
         @games[p].text = @match.player_games(p).to_s
         @games[p].set_xalign 0.5
-        @games[p].style_context.add_class 'game'
-        @games[p].style_context.add_provider(@css_provider, Gtk::StyleProvider::PRIORITY_USER)
+        @games[p].override_font(Pango::FontDescription.new(@settings[:games_font]))
+        @games[p].override_color :normal, @settings[:games_color]
         @games[p].set_margin_right 7
         @games[p].set_margin_top 5
         @games[p].set_margin_bottom 5
         @games[p].set_margin_left 7
         b = Gtk::Box.new :vertical, 0
-        b.override_background_color(0, @settings[:games_color])
+        b.override_background_color(0, @settings[:games_bgcolor])
         b.set_center_widget @games[p]
         b.margin = 0
         @grid.attach b, 2, p, 1, 1
@@ -129,14 +119,14 @@ module Score
         end
 
         @scores[p][g].set_xalign 1
-        @scores[p][g].style_context.add_class 'score'
-        @scores[p][g].style_context.add_provider(@css_provider, Gtk::StyleProvider::PRIORITY_USER)
+        @scores[p][g].override_font(Pango::FontDescription.new(@settings[:scores_font]))
+        @scores[p][g].override_color :normal, @settings[:scores_color]
         @scores[p][g].set_margin_right 8
         @scores[p][g].set_margin_top 5
         @scores[p][g].set_margin_bottom 5
         @scores[p][g].set_margin_left 8
         b = Gtk::Box.new :vertical, 0
-        b.override_background_color 0, @settings[:scores_color]
+        b.override_background_color 0, @settings[:scores_bgcolor]
         b.set_center_widget @scores[p][g]
         b.margin = 0
         @grid.attach b, 3+g, p, 1, 1

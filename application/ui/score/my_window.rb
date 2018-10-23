@@ -1,3 +1,4 @@
+require 'json'
 module Score
     class MyWindow < Gtk::ApplicationWindow
         # Register the class in the GLib world
@@ -42,12 +43,13 @@ module Score
                 @match.save!
             end
             match_settings_menu.signal_connect 'activate' do
-                dialog = Score::MatchSettingsWindow.new({parent: self}, {number_of_games: @match.number_of_games}.merge(@match.settings||{}))
+                dialog = Score::MatchSettingsWindow.new({parent: self}, {number_of_games: @match.number_of_games}.merge(@settings||{}))
                 if dialog.run == Gtk::ResponseType::OK
                     @match.number_of_games = dialog.settings[:number_of_games]
-                    @match.settings = dialog.settings
-                    @scoreboard_window.settings = @match.settings
+                    @settings = dialog.settings
+                    @scoreboard_window.settings = @settings
                     @scoreboard_window.match = @match
+                    save_settings!
                     init_ui           
                 end
                 dialog.destroy;    
@@ -130,6 +132,12 @@ module Score
 
     private
 
+        def save_settings!
+            File.open(File.join(application.user_data_path, '.settings.json'), 'w') do |file|
+                file.write @settings.to_json
+              end
+        end
+
         def update_match
             players = [{name: @names[0].text, games: [], serve: @rb[0].active?}, {name: @names[1].text, games: [], serve: @rb[1].active?}]
             for p in 0..1
@@ -155,7 +163,6 @@ module Score
 
         def load_match
             @match = Score::MyMatch.new(user_data_path: application.user_data_path, filename: '.gtk-score/match1.json')
-#            @scoreboard_window.settings = @match.settings
             @scoreboard_window.match = @match
             init_ui
         end

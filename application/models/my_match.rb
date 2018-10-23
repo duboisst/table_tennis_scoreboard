@@ -2,7 +2,7 @@ require 'json'
 
 module Score
   class MyMatch
-    PROPERTIES = [:id, :number_of_games, :players, :settings, :filename, :creation_datetime].freeze
+    PROPERTIES = [:id, :number_of_games, :players, :filename, :creation_datetime].freeze
 
     attr_accessor *PROPERTIES
 
@@ -21,7 +21,6 @@ module Score
 
         @players = options[:players] 
         @number_of_games = options[:number_of_games] || 5
-        @settings = options[:settings] || {}
       end
 
       limits!
