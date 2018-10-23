@@ -9,7 +9,6 @@ Dir[File.join(application_root_path, '**', '*.rb')].each { |file|
   require file unless file == File.expand_path(__FILE__)
 }
 
-=begin
 # Define the source & target files of the glib-compile-resources command
 resource_xml = File.join(application_root_path, 'resources', 'gresources.xml')
 resource_bin = File.join(application_root_path, 'gresource.bin')
@@ -27,7 +26,6 @@ at_exit do
   # Before existing, please remove the binary we produced, thanks.
   FileUtils.rm_f(resource_bin)
 end
-=end
 
 app = Score::Application.new
 puts app.run

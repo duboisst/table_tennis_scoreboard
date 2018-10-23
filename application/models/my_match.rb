@@ -30,13 +30,13 @@ module Score
     def load_from_file(filename)
       puts "LOAD MATCH #{filename}"
       properties = JSON.parse(File.read(filename),{:symbolize_names => true})
-      puts "Properties: #{properties.inspect}"
+      puts "LOAD - Properties: #{properties.inspect}"
 
       # Assign the properties
       PROPERTIES.each do |property|
         self.send "#{property}=", properties[property]
       end
-      puts "Players: #{players.inspect}"
+      puts "LOAD - Players: #{players.inspect}"
     rescue => e
       raise ArgumentError, "Failed to load existing item: #{e.message}"
     end
@@ -75,6 +75,11 @@ module Score
 
     def player_has_serve? player_indice
       players[player_indice][:serve]
+    end
+
+    def players=(input)
+      @players = input
+      limits!
     end
 
     private
