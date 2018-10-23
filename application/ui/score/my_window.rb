@@ -11,6 +11,8 @@ module Score
 
         def initialize(application)
             super application: application            
+            @settings_file = File.join(application.user_data_path, '.settings.json')
+            load_settings!
             @scoreboard_window = ScoreWindow.new
             new_match
         end
@@ -132,10 +134,19 @@ module Score
 
     private
 
+        def load_settings!
+            @settings = JSON.parse(File.read(@settings_file),{:symbolize_names => true})
+            puts "@settings: #{@settings.inspect}"
+            [:players_color, :players_bgcolor, :games_color, :games_bgcolor, :scores_color, :scores_bgcolor].each do |c|
+                @settings[c] = Gdk::RGBA.parse(@settings[c]) if @settings[c]
+            end
+            puts "@settings: #{@settings.inspect}"
+        end
+
         def save_settings!
-            File.open(File.join(application.user_data_path, '.settings.json'), 'w') do |file|
+            File.open(@settings_file, 'w') do |file|
                 file.write @settings.to_json
-              end
+            end
         end
 
         def update_match
@@ -157,6 +168,7 @@ module Score
 
         def new_match
             @match = Score::MyMatch.new(id: 'match1', user_data_path: application.user_data_path, number_of_games: 5)
+            @scoreboard_window.settings = @settings
             @scoreboard_window.match =  @match
             init_ui
         end
