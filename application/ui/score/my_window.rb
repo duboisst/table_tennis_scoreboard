@@ -42,7 +42,12 @@ module Score
                 @match.save!
             end
             match_settings_menu.signal_connect 'activate' do
-                Score::MatchSettingsWindow.new({}, self, @match).present
+                dialog = Score::MatchSettingsWindow.new({parent: self},  @match)
+                if dialog.run == Gtk::ResponseType::OK
+                    col = dialog.players_color.to_s
+                    puts "players color: #{col}"
+                end
+                dialog.destroy;    
             end
 
             mb.append file

@@ -16,20 +16,23 @@ module Score
           end
       end
 
-      def initialize(options, parent_window, match)
+      attr_reader :players_color
+
+      def initialize(options, match)
         super options
         set_modal true
         set_resizable false
         set_title "Configurer le match"
         @match = match
         number_of_games_spinbutton.value = @match.number_of_games
-        
+
         ok_button.signal_connect 'clicked' do 
-          parent_window.update_settings @match
+          response Gtk::ResponseType::OK
           close
         end
 
         cancel_button.signal_connect 'clicked' do 
+          response Gtk::ResponseType::CANCEL
           close
         end
 
@@ -38,7 +41,12 @@ module Score
         end
 
         players_bgcolor_button.signal_connect 'clicked' do 
-          Score::ColorChooserDialog.new({}, self).present
+          dialog = Gtk::ColorChooserDialog.new(title: "Choisis ta couleur", parent: self)
+          if dialog.run == Gtk::ResponseType::OK
+            @players_color = dialog.rgba
+            puts "config - players color: #{@players_color}"
+          end
+          dialog.destroy;
         end
         games_bgcolor_button.signal_connect 'clicked' do 
           Score::ColorChooserDialog.new({}, self).present
