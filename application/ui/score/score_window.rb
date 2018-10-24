@@ -15,8 +15,6 @@ module Score
         @settings.merge!(settings)
       end
 
-    private
-
       def init_ui
         self.children.each do |widget|
           self.remove widget

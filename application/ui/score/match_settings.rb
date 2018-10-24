@@ -25,12 +25,14 @@ module Score
 
       attr_reader :settings
 
-      def initialize(options, settings)
+      def initialize(options, scoreboard_window, settings)
         super options
         set_modal true
         set_resizable false
         set_title "Configurer le match"
         set_position Gtk::WindowPosition::MOUSE
+        @scoreboard_window = scoreboard_window
+        @original_settings = settings
         @settings = settings
         number_of_games_spinbutton.value = @settings[:number_of_games]
 
@@ -40,6 +42,7 @@ module Score
         end
 
         cancel_button.signal_connect 'clicked' do 
+          @settings = @orginal_settings
           response Gtk::ResponseType::CANCEL
           close
         end
@@ -76,6 +79,7 @@ private
               @settings[option[:setting]] = dialog.font
             end
             dialog.destroy;
+            preview
           end
         end
       end
@@ -89,8 +93,14 @@ private
               @settings[option[:setting]] = dialog.rgba
             end
             dialog.destroy;
+            preview
           end
         end
+      end
+
+      def preview
+        @scoreboard_window.settings = @settings
+        @scoreboard_window.init_ui
       end
 
     end

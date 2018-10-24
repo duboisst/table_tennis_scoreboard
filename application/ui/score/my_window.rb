@@ -45,14 +45,19 @@ module Score
                 @match.save!
             end
             match_settings_menu.signal_connect 'activate' do
-                dialog = Score::MatchSettingsWindow.new({parent: self}, {number_of_games: @match.number_of_games}.merge(@settings||{}))
-                if dialog.run == Gtk::ResponseType::OK
+                dialog = Score::MatchSettingsWindow.new({parent: self}, @scoreboard_window, {number_of_games: @match.number_of_games}.merge(@settings||{}))
+                r = dialog.run
+                if r == Gtk::ResponseType::OK
                     @match.number_of_games = dialog.settings[:number_of_games]
                     @settings = dialog.settings
                     @scoreboard_window.settings = @settings
                     @scoreboard_window.match = @match
                     save_settings!
                     init_ui           
+                end
+                if r == Gtk::ResponseType::CANCEL
+                    @scoreboard_window.settings = @settings
+                    @scoreboard_window.init_ui           
                 end
                 dialog.destroy;    
             end
