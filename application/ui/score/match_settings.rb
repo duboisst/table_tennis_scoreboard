@@ -10,6 +10,7 @@ module Score
             bind_template_child 'number_of_games_spinbutton'
             bind_template_child 'ok_button'
             bind_template_child 'cancel_button'
+            bind_template_child 'borders_color_button'
             bind_template_child 'players_font_button'
             bind_template_child 'players_color_button'
             bind_template_child 'players_bgcolor_button'
@@ -34,7 +35,6 @@ module Score
         number_of_games_spinbutton.value = @settings[:number_of_games]
 
         ok_button.signal_connect 'clicked' do 
-          puts "@settings: #{@settings.inspect}"
           response Gtk::ResponseType::OK
           close
         end
@@ -55,6 +55,7 @@ module Score
         ]
 
         signal_connect_color_buttons [
+          {button: borders_color_button, title: "Couleur des bordures", setting: :borders_color},
           {button: players_color_button, title: "Couleur des joueurs", setting: :players_color},
           {button: games_color_button, title: "Couleur des manches", setting: :games_color},
           {button: scores_color_button, title: "Couleur des scores", setting: :scores_color},
@@ -67,7 +68,6 @@ module Score
 private
 
       def signal_connect_font_buttons(options)
-        puts "options: #{options.inspect}"
         options.each do |option|
           option[:button].signal_connect 'clicked' do 
             dialog = Gtk::FontChooserDialog.new(title: option[:title], parent: self)
@@ -82,13 +82,10 @@ private
 
       def signal_connect_color_buttons(options)
         options.each do |option|
-          puts "option: #{option.inspect}"
           option[:button].signal_connect 'clicked' do 
             dialog = Gtk::ColorChooserDialog.new(title: option[:title], parent: self)
-            puts "clicked avant set : #{@settings[option[:setting]].inspect}"
             dialog.set_rgba @settings[option[:setting]] if @settings[option[:setting]]
             if dialog.run == Gtk::ResponseType::OK
-              puts "clicked dans ok - rgba: #{dialog.rgba.inspect}"
               @settings[option[:setting]] = dialog.rgba
             end
             dialog.destroy;

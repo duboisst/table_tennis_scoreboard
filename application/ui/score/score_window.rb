@@ -3,7 +3,7 @@ module Score
 
       def initialize
         super 0
-        @settings = {players_font: "Sans 10", players_color: Gdk::RGBA.parse('#ffffff'), games_color: Gdk::RGBA.parse('#ffffff'), scores_color: Gdk::RGBA.parse('#ffffff'), players_bgcolor: Gdk::RGBA.parse('#3664c9'), games_bgcolor: Gdk::RGBA.parse('#df2629'), scores_bgcolor: Gdk::RGBA.parse('#3664c9')}
+        @settings = {players_font: "Sans 10", borders_color: Gdk::RGBA.parse('white'), players_color: Gdk::RGBA.parse('white'), games_color: Gdk::RGBA.parse('white'), scores_color: Gdk::RGBA.parse('white'), players_bgcolor: Gdk::RGBA.parse('#3664c9'), games_bgcolor: Gdk::RGBA.parse('#df2629'), scores_bgcolor: Gdk::RGBA.parse('#3664c9')}
       end
 
       def match=(match)
@@ -29,7 +29,7 @@ module Score
         set_decorated true
         set_deletable false
         set_window_position :center
-        override_background_color(0, Gdk::RGBA.parse('white'))
+        override_background_color(0, @settings[:borders_color])
 
         hbox = Gtk::Box.new :horizontal, 2
 

@@ -137,7 +137,7 @@ module Score
         def load_settings!
             @settings = JSON.parse(File.read(@settings_file),{:symbolize_names => true})
             puts "@settings: #{@settings.inspect}"
-            [:players_color, :players_bgcolor, :games_color, :games_bgcolor, :scores_color, :scores_bgcolor].each do |c|
+            [:borders_color, :players_color, :players_bgcolor, :games_color, :games_bgcolor, :scores_color, :scores_bgcolor].each do |c|
                 @settings[c] = Gdk::RGBA.parse(@settings[c]) if @settings[c]
             end
             puts "@settings: #{@settings.inspect}"
